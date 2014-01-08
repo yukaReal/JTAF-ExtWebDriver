@@ -65,6 +65,10 @@ public class DefaultSessionFactory implements SessionFactory {
     private static final Object lock = new Object();
     private static final Log log = LogFactory.getLog(DefaultSessionFactory.class);
     private static boolean executedTaskKill = false;
+    
+    public static enum SUPPORTED_OSS {
+    	linux, mac, windows 
+    }
 
     /*
      * (non-Javadoc)
@@ -94,10 +98,9 @@ public class DefaultSessionFactory implements SessionFactory {
                         }
                     } else if (properties.getBrowser().equalsIgnoreCase("chrome")) {
                         if (properties.getOS() == null
-                                || properties.getOS().equalsIgnoreCase("windows")) {
+                                || properties.getOS().equalsIgnoreCase(SUPPORTED_OSS.windows.name())) {
                             try {
                                 Runtime.getRuntime().exec("taskkill /F /IM chromedriver.exe /T");
-
                             } catch (IOException e) {
                                 log.warn("Taskkill failed to kill any rogue chromedriver.exe processes");
                             }
@@ -105,9 +108,8 @@ public class DefaultSessionFactory implements SessionFactory {
                                 Runtime.getRuntime().exec("taskkill /F /IM chrome.exe /T");
                             } catch (IOException e) {
                                 log.warn("Taskkill failed to kill any rogue chrome browsers");
-
                             }
-                        } else if (properties.getOS().equalsIgnoreCase("linux")) {
+                        } else if (properties.getOS().equalsIgnoreCase(SUPPORTED_OSS.linux.name())) {
                             try {
                                 Runtime.getRuntime().exec("killall -9 chromedriver");
                             } catch (IOException e) {
@@ -118,7 +120,7 @@ public class DefaultSessionFactory implements SessionFactory {
                             } catch (IOException e) {
                                 log.warn("Taskkill failed to kill any rogue chrome browsers");
                             }
-                        } else if (properties.getOS().equalsIgnoreCase("mac")) {
+                        } else if (properties.getOS().equalsIgnoreCase(SUPPORTED_OSS.mac.name())) {
                             try {
                                 Runtime.getRuntime().exec("killall -KILL chromedriver");
                             } catch (IOException e) {
@@ -130,13 +132,13 @@ public class DefaultSessionFactory implements SessionFactory {
                                 log.warn("Taskkill failed to kill any rogue chrome browsers");
                             }
                         } else {
-                            log.warn("Taskkill failed to kill any rogue chromedriver or chrome tasks because the OS"
-                                    + "provided is either incorrect or not supported");
+                        	log.warn("Unsupported OS: " + properties.getOS()
+                        			+ " Currently supported only '" + Arrays.toString(SUPPORTED_OSS.values()) + "'");
                         }
                     } else if (properties.getBrowser().equalsIgnoreCase("firefox")
                             || properties.getBrowser().equalsIgnoreCase("*firefox")) {
                         if (properties.getOS() == null
-                                || properties.getOS().equalsIgnoreCase("windows")) {
+                                || properties.getOS().equalsIgnoreCase(SUPPORTED_OSS.windows.name())) {
                             // there is no taskkill for FirefoxDriver because
                             // there is no "server" used for Firefox
                             try {
@@ -145,21 +147,21 @@ public class DefaultSessionFactory implements SessionFactory {
                             } catch (IOException e) {
                                 log.warn("Taskkill failed to kill any rogue firefox browsers");
                             }
-                        } else if (properties.getOS().equalsIgnoreCase("linux")) {
+                        } else if (properties.getOS().equalsIgnoreCase(SUPPORTED_OSS.linux.name())) {
                             try {
                                 Runtime.getRuntime().exec("killall -9 firefox");
                             } catch (IOException e) {
                                 log.warn("Taskkill failed to kill any rogue firefox browsers");
                             }
-                        } else if (properties.getOS().equalsIgnoreCase("mac")) {
+                        } else if (properties.getOS().equalsIgnoreCase(SUPPORTED_OSS.mac.name())) {
                             try {
                                 Runtime.getRuntime().exec("killall -KILL firefox");
                             } catch (IOException e) {
                                 log.warn("Taskkill failed to kill any rogue firefox browsers");
                             }
                         } else {
-                            log.warn("Taskkill failed to kill any rogue firefox tasks because the OS"
-                                    + "provided is either incorrect or not supported");
+                            log.warn("Unsupported OS: " + properties.getOS()
+                            		+ " Currently supported only '" + Arrays.toString(SUPPORTED_OSS.values()) + "'");
                         }
                     }
                 }
